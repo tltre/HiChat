@@ -66,7 +66,7 @@ func UserLoginByNameAndPwd(ctx *gin.Context) {
 	}
 
 	// JWT identify
-	token, err := middleware.GenerateToken(Rsp.ID, "yk")
+	token, err := middleware.GenerateToken(Rsp.ID, "xy")
 	if err != nil {
 		zap.S().Info("Failed to generate token")
 		return
@@ -83,9 +83,9 @@ func UserLoginByNameAndPwd(ctx *gin.Context) {
 // UserRegister Post Method
 func UserRegister(ctx *gin.Context) {
 	user := models.UserBasic{}
-	username := ctx.Request.FormValue("name")
-	pwd := ctx.Request.FormValue("password")
-	rePwd := ctx.Request.FormValue("identity")
+	username := ctx.PostForm("name")
+	pwd := ctx.PostForm("password")
+	rePwd := ctx.PostForm("identity")
 
 	// Username and Password can not be empty
 	if username == "" || pwd == "" || rePwd == "" {
@@ -134,7 +134,15 @@ func UserRegister(ctx *gin.Context) {
 	user.HeartBeatTime = &t
 
 	// create user in DB
-	dao.CreateUser(user)
+	err = dao.CreateUser(user)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"code": -1, // -1 means error
+			"msg":  "Create User in DB error",
+			"data": username,
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": 0,
@@ -147,7 +155,7 @@ func UserRegister(ctx *gin.Context) {
 func UpdateUserInformation(ctx *gin.Context) {
 	user := models.UserBasic{}
 
-	id, err := strconv.Atoi(ctx.Request.FormValue("id"))
+	id, err := strconv.Atoi(ctx.PostForm("id"))
 	if err != nil {
 		zap.S().Info("Failed to Exchange type")
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -220,7 +228,7 @@ func UpdateUserInformation(ctx *gin.Context) {
 func DeleteUser(ctx *gin.Context) {
 	user := models.UserBasic{}
 
-	id, err := strconv.Atoi(ctx.Request.FormValue("id"))
+	id, err := strconv.Atoi(ctx.PostForm("id"))
 	if err != nil {
 		zap.S().Info("Failed to Exchange type")
 		ctx.JSON(http.StatusInternalServerError, gin.H{
