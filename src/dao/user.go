@@ -29,7 +29,7 @@ func GetUserByNameAndPwd(name string, pwd string) (*models.UserBasic, error) {
 	// Login in Identify
 	curTime := strconv.Itoa(int(time.Now().UnixNano()))
 	md5time := common.Md5encoder(curTime)
-	if tx := global.DB.Where("id = ?", user.ID).Update("identity = ?", md5time); tx.RowsAffected == 0 {
+	if tx := global.DB.Model(&user).Where("id = ?", user.ID).Update("identity", md5time); tx.RowsAffected == 0 {
 		return nil, errors.New("update Identity Failed")
 	}
 
@@ -48,7 +48,7 @@ func GetUserByNameForLoginIn(name string) (*models.UserBasic, error) {
 // GetUserByNameForRegister Query User by Name, Used in Register
 func GetUserByNameForRegister(name string) (*models.UserBasic, error) {
 	var user models.UserBasic
-	if tx := global.DB.Where("name = ?", name).First(&user); tx.RowsAffected == 0 {
+	if tx := global.DB.Where("name = ?", name).First(&user); tx.RowsAffected != 0 {
 		return nil, errors.New("username has existed")
 	}
 	return &user, nil
@@ -94,7 +94,7 @@ func CreateUser(user models.UserBasic) error {
 
 // UpdateUser modifier the User Information
 func UpdateUser(user models.UserBasic) error {
-	tx := global.DB.Updates(models.UserBasic{
+	tx := global.DB.Model(&user).Updates(models.UserBasic{
 		Name:     user.Name,
 		PassWord: user.PassWord,
 		Avatar:   user.Avatar,
