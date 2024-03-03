@@ -28,7 +28,7 @@ func GetUserByNameAndPwd(name string, pwd string) (*models.UserBasic, error) {
 
 	// Login in Identify
 	curTime := strconv.Itoa(int(time.Now().UnixNano()))
-	md5time := common.Md5encoder(curTime)
+	md5time := common.Md5Encoder(curTime)
 	if tx := global.DB.Model(&user).Where("id = ?", user.ID).Update("identity", md5time); tx.RowsAffected == 0 {
 		return nil, errors.New("update Identity Failed")
 	}

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Model record model implemented by authority
+// Model record model implemented by authority, is consistent with gorm.Model
 type Model struct {
 	ID        uint `gorm:"primaryKey"`
 	CreatedAt time.Time

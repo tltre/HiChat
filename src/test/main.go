@@ -5,7 +5,8 @@ func main() {
 	db := ConnectToDatabase()
 
 	// create the user_basic table
-	CreateUserTable(db)
+	// CreateUserTable(db)
 
-	// test User table
+	// create the Relation table
+	CreateRelationTable(db)
 }

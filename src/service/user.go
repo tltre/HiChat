@@ -19,49 +19,46 @@ import (
 func UserList(ctx *gin.Context) {
 	list, err := dao.GetUserList()
 	if err != nil {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "GetUserList Error",
-		})
+		zap.S().Info("DB GetUserList Failed")
+		errMsg := "GetUserList Error"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, list)
+	common.SendNormalResp(ctx.Writer, "Success to Get User List", nil, list, len(list))
 }
 
 // UserLoginByNameAndPwd Post method
 func UserLoginByNameAndPwd(ctx *gin.Context) {
 	username := ctx.PostForm("name")
 	pwd := ctx.PostForm("password")
-	data, err := dao.GetUserByNameForLoginIn(username)
+	user, err := dao.GetUserByNameForLoginIn(username)
 	if err != nil {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Failed to Login in",
-		})
+		zap.S().Info(err.Error())
+		errMsg := "Failed to Login in"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
-	if data.Name == "" {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Username didn't exist",
-		})
+	if user.Name == "" {
+		errMsg := "Username didn't exist"
+		zap.S().Info(errMsg)
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
 		return
 	}
 
 	// password in database is encrypted, thus we should encrypt again to compare
-	ok := common.CheckPassword(pwd, data.Salt, data.PassWord)
+	ok := common.CheckPassword(pwd, user.Salt, user.PassWord)
 	if !ok {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Password incorrect",
-		})
+		errMsg := "Password incorrect"
+		zap.S().Info(errMsg)
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
 		return
 	}
 
-	Rsp, err := dao.GetUserByNameAndPwd(username, data.PassWord)
+	Rsp, err := dao.GetUserByNameAndPwd(username, user.PassWord)
 	if err != nil {
-		zap.S().Info("Failed to Login in")
+		zap.S().Info(err.Error())
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, "Failed to Login in", nil)
 		return
 	}
 
@@ -69,15 +66,14 @@ func UserLoginByNameAndPwd(ctx *gin.Context) {
 	token, err := middleware.GenerateToken(Rsp.ID, "xy")
 	if err != nil {
 		zap.S().Info("Failed to generate token")
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, "Failed to generate token", nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"code":   0,
-		"msg":    "Success to Login in",
-		"token":  token,
-		"userId": Rsp.ID,
-	})
+	data := make(map[string]string)
+	data["token"] = token
+	data["userId"] = strconv.Itoa(int(Rsp.ID))
+	common.SendNormalResp(ctx.Writer, "Success to Login in", data, user, 1)
 }
 
 // UserRegister Post Method
@@ -87,34 +83,31 @@ func UserRegister(ctx *gin.Context) {
 	pwd := ctx.PostForm("password")
 	rePwd := ctx.PostForm("identity")
 
+	data := make(map[string]string)
+
 	// Username and Password can not be empty
 	if username == "" || pwd == "" || rePwd == "" {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Username and Password can not be empty",
-			"data": username,
-		})
-		return
+		errMsg := "Username and Password can not be empty"
+		data["username"] = username
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, data)
 	}
 
 	//Check if the Identity matches the password
 	if pwd != rePwd {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Password is not equal to Identity",
-			"data": username,
-		})
+		errMsg := "Password is not equal to Identity"
+		zap.S().Info(errMsg)
+		data["username"] = username
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
 		return
 	}
 
 	// Check if the username exists
 	_, err := dao.GetUserByNameForRegister(username)
 	if err != nil {
-		ctx.JSON(200, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Username is exist",
-			"data": username,
-		})
+		errMsg := "Username is exist"
+		zap.S().Info(errMsg)
+		data["username"] = username
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
 		return
 	}
 
@@ -136,19 +129,14 @@ func UserRegister(ctx *gin.Context) {
 	// create user in DB
 	err = dao.CreateUser(user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Create User in DB error",
-			"data": username,
-		})
+		errMsg := "Create User in DB error"
+		zap.S().Info(errMsg)
+		data["username"] = username
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "Success to Register",
-		"data": user,
-	})
+	common.SendNormalResp(ctx.Writer, "Success to Register", nil, user, 1)
 }
 
 // UpdateUserInformation 更新用户信息
@@ -158,10 +146,8 @@ func UpdateUserInformation(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.PostForm("id"))
 	if err != nil {
 		zap.S().Info("Failed to Exchange type")
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Failed to Update User Information",
-		})
+		errMsg := "Failed to Update User Information"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
@@ -199,10 +185,8 @@ func UpdateUserInformation(ctx *gin.Context) {
 	_, err = govalidator.ValidateStruct(user)
 	if err != nil {
 		zap.S().Info("Params didn't match")
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Params didn't validated",
-		})
+		errMsg := "Params didn't validated"
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
 		return
 	}
 
@@ -210,18 +194,12 @@ func UpdateUserInformation(ctx *gin.Context) {
 	err = dao.UpdateUser(user)
 	if err != nil {
 		zap.S().Info("Update User in DB error")
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Failed to update User",
-		})
+		errMsg := "Failed to update User"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0, // -1 means error
-		"msg":  "Success to Update User",
-		"data": user,
-	})
+	common.SendNormalResp(ctx.Writer, "Success to Update User", nil, user, 1)
 }
 
 // DeleteUser Del Method
@@ -231,10 +209,8 @@ func DeleteUser(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.PostForm("id"))
 	if err != nil {
 		zap.S().Info("Failed to Exchange type")
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Failed to Delete User",
-		})
+		errMsg := "Failed to delete User"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
@@ -242,15 +218,10 @@ func DeleteUser(ctx *gin.Context) {
 	err = dao.DeleteUser(user)
 	if err != nil {
 		zap.S().Info("Delete User in DB error")
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"code": -1, // -1 means error
-			"msg":  "Failed to delete User",
-		})
+		errMsg := "Failed to delete User"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0, // -1 means error
-		"msg":  "Success to Delete User",
-	})
+	common.SendNormalResp(ctx.Writer, "Success to Delete User", nil, nil, 0)
 }

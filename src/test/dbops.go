@@ -26,3 +26,10 @@ func CreateUserTable(db *gorm.DB) {
 		panic(err)
 	}
 }
+
+func CreateRelationTable(db *gorm.DB) {
+	err := db.AutoMigrate(&models.Relation{})
+	if err != nil {
+		panic(err)
+	}
+}

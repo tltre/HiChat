@@ -7,8 +7,8 @@ import (
 	"io"
 )
 
-// Md5encoder Encode the PassWord by Md5
-func Md5encoder(code string) string {
+// Md5Encoder Encode the PassWord by Md5
+func Md5Encoder(code string) string {
 	m := md5.New()
 	io.WriteString(m, code)
 	return hex.EncodeToString(m.Sum(nil))
@@ -22,6 +22,6 @@ func CheckPassword(curPwd string, salt string, dbPwd string) bool {
 
 // SaltPassword return the password with salt
 func SaltPassword(pwd string, salt string) string {
-	saltPwd := fmt.Sprintf("%s%s", Md5encoder(pwd), salt)
+	saltPwd := fmt.Sprintf("%s%s", Md5Encoder(pwd), salt)
 	return saltPwd
 }
