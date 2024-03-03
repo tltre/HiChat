@@ -90,6 +90,7 @@ func UserRegister(ctx *gin.Context) {
 		errMsg := "Username and Password can not be empty"
 		data["username"] = username
 		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, data)
+		return
 	}
 
 	//Check if the Identity matches the password

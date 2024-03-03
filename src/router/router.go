@@ -28,5 +28,15 @@ func Router() *gin.Engine {
 		user.DELETE("/delete", middleware.Authentication(), service.DeleteUser)
 	}
 
+	// Relation Module
+	relation := v1.Group("relation").Use(middleware.Authentication())
+	{
+		// Friends API
+		relation.GET("/list", service.FriendList)
+		relation.POST("/add", service.AddFriendByName)
+		relation.POST("/update", service.UpdateRelation)
+		relation.DELETE("/delete", service.DelFriendByName)
+	}
+
 	return router
 }
