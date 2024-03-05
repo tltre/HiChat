@@ -20,15 +20,28 @@ func ConnectToDatabase() *gorm.DB {
 	return db
 }
 
-func CreateUserTable(db *gorm.DB) {
+func CreateTables(db *gorm.DB) {
+	createUserTable(db)
+	createRelationTable(db)
+	createCommunityTable(db)
+}
+
+func createUserTable(db *gorm.DB) {
 	err := db.AutoMigrate(&models.UserBasic{})
 	if err != nil {
 		panic(err)
 	}
 }
 
-func CreateRelationTable(db *gorm.DB) {
+func createRelationTable(db *gorm.DB) {
 	err := db.AutoMigrate(&models.Relation{})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func createCommunityTable(db *gorm.DB) {
+	err := db.AutoMigrate(&models.Community{})
 	if err != nil {
 		panic(err)
 	}
