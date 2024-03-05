@@ -104,7 +104,8 @@ func AddFriendByName(userId uint, targetName string) error {
 	return AddFriendById(userId, targetUser.ID)
 }
 
-func UpdateRelation(userId uint, targetName string, r models.Relation) error {
+// UpdateFriendRelation Update type and desc of target friend relation record
+func UpdateFriendRelation(userId uint, targetName string, r models.Relation) error {
 	// check if targetUser exist
 	targetUser, err := GetUserByNameForLoginIn(targetName)
 	if err != nil || targetUser.ID == 0 {
@@ -129,20 +130,14 @@ func UpdateRelation(userId uint, targetName string, r models.Relation) error {
 	// open transaction
 	tx := global.DB.Begin()
 
-	t := tx.Model(&r).Where("id = ?", r1).Updates(models.Relation{
-		Type: r.Type,
-		Desc: r.Desc,
-	})
+	t := tx.Model(&r).Where("id = ?", r1).Updates(&r)
 	if t.RowsAffected == 0 {
 		tx.Rollback()
 		zap.S().Info("Failed to Update Relation")
 		return errors.New("failed to Update Relation")
 	}
 
-	t = tx.Model(&r).Where("id = ?", r2).Updates(models.Relation{
-		Type: r.Type,
-		Desc: r.Desc,
-	})
+	t = tx.Model(&r).Where("id = ?", r2).Updates(&r)
 	if t.RowsAffected == 0 {
 		tx.Rollback()
 		zap.S().Info("Failed to Update Relation")
@@ -153,7 +148,22 @@ func UpdateRelation(userId uint, targetName string, r models.Relation) error {
 	return nil
 }
 
-func DeleteRelation(userId uint, targetName string) error {
+// UpdateGroupRelation update relation by gid
+func UpdateGroupRelation(gid string, r models.Relation) error {
+	group, err := FindGroupByGid(gid)
+	if err != nil {
+		zap.S().Info("Target Group is not exist")
+		return errors.New("target group is not exist")
+	}
+	if tx := global.DB.Model(&r).Where("id = ?", group.ID).Updates(&r); tx.RowsAffected == 0 {
+		zap.S().Info("Failed to Update Relation")
+		return errors.New("failed to Update Relation")
+	}
+	return nil
+}
+
+// DeleteFriendRelation delete friend relation
+func DeleteFriendRelation(userId uint, targetName string) error {
 	// check if targetUser exist
 	targetUser, err := GetUserByNameForLoginIn(targetName)
 	if err != nil || targetUser.ID == 0 {

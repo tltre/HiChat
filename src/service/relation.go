@@ -85,23 +85,47 @@ func UpdateRelation(ctx *gin.Context) {
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	targetName := ctx.PostForm("target_name")
 
 	// Get update Information
 	r := models.Relation{}
-
 	desc := ctx.PostForm("desc")
-
 	if desc != "" {
 		r.Desc = desc
 	}
 
-	if err = dao.UpdateRelation(uint(ownerId), targetName, r); err != nil {
-		zap.S().Info(err.Error())
-		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
+	relationType := ctx.PostForm("type")
+	if relationType == "1" {
+		// Relation Type is Friend
+		targetName := ctx.PostForm("target_name")
+		if targetName == "" {
+			zap.S().Info("Don't have necessary params")
+			errMsg := "please add necessary params: target_name"
+			common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
+			return
+		}
+		if err = dao.UpdateFriendRelation(uint(ownerId), targetName, r); err != nil {
+			zap.S().Info(err.Error())
+			common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
+	} else if relationType == "2" {
+		gid := ctx.PostForm("gid")
+		if gid == "" {
+			zap.S().Info("Don't have necessary params")
+			errMsg := "please add necessary params: gid"
+			common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
+			return
+		}
+		if err = dao.UpdateGroupRelation(gid, r); err != nil {
+			zap.S().Info(err.Error())
+			common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
+			return
+		}
+	} else {
+		zap.S().Info("Invalid type")
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, "Type is Invalid, it should be 1 or 2", nil)
 		return
 	}
-
 	common.SendNormalResp(ctx.Writer, "Successfully Update", nil, nil, 0)
 }
 
@@ -117,7 +141,7 @@ func DelFriendByName(ctx *gin.Context) {
 	}
 	targetName := ctx.PostForm("target_name")
 
-	if err := dao.DeleteRelation(uint(ownerId), targetName); err != nil {
+	if err := dao.DeleteFriendRelation(uint(ownerId), targetName); err != nil {
 		zap.S().Info(err.Error())
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -155,19 +179,22 @@ func CreateGroup(ctx *gin.Context) {
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	tp, err := strconv.Atoi(ctx.PostForm("type"))
-	if err != nil {
-		zap.S().Info(err.Error())
-		errMsg := "Failed to Get type"
-		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
-		return
+	var tp = 0
+	if typeStr := ctx.PostForm("type"); typeStr != "" {
+		if tp, err = strconv.Atoi(typeStr); err != nil {
+			zap.S().Info(err.Error())
+			errMsg := "Failed to Get type"
+			common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
+			return
+		}
 	}
+	name := ctx.PostForm("name")
 	image := ctx.PostForm("image")
 	desc := ctx.PostForm("desc")
 
 	// create community record
 	community := models.Community{
-		Name:    "",
+		Name:    name,
 		OwnerId: uint(ownerId),
 		Type:    tp,
 		Image:   image,
@@ -234,4 +261,93 @@ func JoinGroup(ctx *gin.Context) {
 		return
 	}
 	common.SendNormalResp(ctx.Writer, "Successfully join group!", nil, nil, 0)
+}
+
+// UpdateGroup Update group information
+func UpdateGroup(ctx *gin.Context) {
+	// try to get Owner id
+	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	if err != nil {
+		zap.S().Info(err.Error())
+		errMsg := "Failed to Get OwnerId"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
+		return
+	}
+	// try to get new Owner id
+	var newOwnerId = 0
+	if NewIdStr := ctx.PostForm("new_owner_id"); NewIdStr != "" {
+		if newOwnerId, err = strconv.Atoi(NewIdStr); err != nil {
+			zap.S().Info(err.Error())
+			errMsg := "Failed to Get newOwnerId"
+			common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
+			return
+		}
+	}
+	// try to get gid
+	gid := ctx.PostForm("group_id")
+	if gid == "" {
+		zap.S().Info("Don't have necessary params")
+		errMsg := "please add necessary params: group_id"
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
+		return
+	}
+	// try to get new Type
+	var tp = 0
+	if typeStr := ctx.PostForm("type"); typeStr != "" {
+		if tp, err = strconv.Atoi(typeStr); err != nil {
+			zap.S().Info(err.Error())
+			errMsg := "Failed to Get type"
+			common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
+			return
+		}
+	}
+	// get other community information
+	name := ctx.PostForm("name")
+	image := ctx.PostForm("image")
+	desc := ctx.PostForm("desc")
+
+	// create community record
+	community := models.Community{
+		Name:    name,
+		OwnerId: uint(newOwnerId),
+		GroupId: gid,
+		Type:    tp,
+		Image:   image,
+		Desc:    desc,
+	}
+
+	curCommunity, err := dao.UpdateCommunityInformation(uint(ownerId), community)
+	if err != nil {
+		zap.S().Info(err.Error())
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	common.SendNormalResp(ctx.Writer, "Successfully Update group!", nil, curCommunity, 1)
+}
+
+// DelGroup Delete or Quit group by userID and gid
+func DelGroup(ctx *gin.Context) {
+	// try to get Owner id
+	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	if err != nil {
+		zap.S().Info(err.Error())
+		errMsg := "Failed to Get OwnerId"
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
+		return
+	}
+	// try to get gid
+	gid := ctx.PostForm("group_id")
+	if gid == "" {
+		zap.S().Info("Don't have necessary params")
+		errMsg := "please add necessary params: group_id"
+		common.SendErrorResp(ctx.Writer, http.StatusBadRequest, errMsg, nil)
+		return
+	}
+	msg, err := dao.DelGroup(uint(ownerId), gid)
+	if err != nil {
+		zap.S().Info(err.Error())
+		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	common.SendNormalResp(ctx.Writer, msg, nil, nil, 0)
 }

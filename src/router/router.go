@@ -36,11 +36,14 @@ func Router() *gin.Engine {
 		relation.POST("/add", service.AddFriendByName)
 		relation.POST("/update", service.UpdateRelation)
 		relation.DELETE("/delete", service.DelFriendByName)
+
 		// Group API
 		relation.GET("/group-list", service.GetGroupList)
 		relation.POST("/new", service.CreateGroup)
 		relation.GET("/search", service.SearchGroup)
 		relation.POST("/join", service.JoinGroup)
+		relation.POST("/update-group", service.UpdateGroup)
+		relation.DELETE("/delete-group", service.DelGroup)
 	}
 
 	return router

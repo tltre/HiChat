@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"HiChat/src/common"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -60,43 +61,33 @@ func Authentication() gin.HandlerFunc {
 		userId, err := strconv.Atoi(id)
 		if err != nil {
 			zap.S().Info("Illegal UserId")
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "Illegal UserId",
-			})
+			common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "Illegal UserId", nil)
 			ctx.Abort()
 			return
 		}
 
 		if token == "" {
 			zap.S().Info("Not Login in yet")
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"msg": "Please Login in",
-			})
+			common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "Please Login in", nil)
 			ctx.Abort()
 			return
 		} else {
 			claim, err := ParseToken(token)
 			if err != nil {
 				zap.S().Info("token invalidity")
-				ctx.JSON(http.StatusUnauthorized, gin.H{
-					"msg": "token invalidity, Please Login in again",
-				})
+				common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "token invalidity, Please Login in again", nil)
 				ctx.Abort()
 				return
 			} else if claim.ExpiresAt < time.Now().Unix() {
 				zap.S().Info("token expired")
-				ctx.JSON(http.StatusUnauthorized, gin.H{
-					"msg": "token expired, Please Login in again",
-				})
+				common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "token expired, Please Login in again", nil)
 				ctx.Abort()
 				return
 			}
 
 			if claim.UserId != uint(userId) {
 				zap.S().Info("Illegal Login in")
-				ctx.JSON(http.StatusUnauthorized, gin.H{
-					"msg": "Login Illegal",
-				})
+				common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "Login Illegal", nil)
 				ctx.Abort()
 				return
 			}

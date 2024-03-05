@@ -114,3 +114,65 @@ func JoinInCommunityByGId(userId uint, groupId string) error {
 
 	return nil
 }
+
+// UpdateCommunityInformation update ownerId, name, type, image and desc information by gid
+func UpdateCommunityInformation(userId uint, community models.Community) (*models.Community, error) {
+	// check if community exist
+	group, err := FindGroupByGid(community.GroupId)
+	if group.ID == 0 || err != nil {
+		zap.S().Info("Group is not exist")
+		return nil, errors.New("group is not exist")
+	}
+	// update
+	newCommunity := models.Community{
+		Name:  community.Name,
+		Type:  community.Type,
+		Image: community.Image,
+		Desc:  community.Desc,
+	}
+	// Only group owner can modify OwnerId
+	if group.OwnerId == userId && community.OwnerId != 0 {
+		newCommunity.OwnerId = community.OwnerId
+	}
+	tx := global.DB.Model(&community).Where("group_id = ?", community.GroupId).Updates(&newCommunity)
+	if tx.RowsAffected == 0 {
+		zap.S().Info("Failed to update")
+		return nil, errors.New("failed to update")
+	}
+	return FindGroupByGid(community.GroupId)
+}
+
+// DelGroup Delete the group record if user is group owner, otherwise Quit the group
+func DelGroup(userId uint, gid string) (string, error) {
+	// check if community exist
+	group, err := FindGroupByGid(gid)
+	if group.ID == 0 || err != nil {
+		zap.S().Info("Group is not exist")
+		return "", errors.New("group is not exist")
+	}
+	// check if the user is owner
+	if group.OwnerId == userId {
+		// delete record in Community & Relation
+		tx := global.DB.Begin()
+		if tx := global.DB.Where("id = ? ", group.ID).Delete(&models.Community{}); tx.RowsAffected == 0 {
+			tx.Rollback()
+			zap.S().Info("Failed to delete in Table Community")
+			return "", errors.New("failed to delete")
+		}
+
+		if tx := global.DB.Where("target_id = ? and type = 2", group.ID).Delete(&models.Relation{}); tx.RowsAffected == 0 {
+			tx.Rollback()
+			zap.S().Info("Failed to delete in Table Relation")
+			return "", errors.New("failed to delete")
+		}
+		tx.Commit()
+		return "Successfully Delete the group", nil
+	} else {
+		// delete record in Relation
+		if tx := global.DB.Where("owner_id = ? and target_id = ? and type = 2", userId, group.ID).Delete(&models.Relation{}); tx.RowsAffected == 0 {
+			zap.S().Info("Failed to delete")
+			return "", errors.New("failed to delete")
+		}
+		return "Successfully quit the group", nil
+	}
+}
