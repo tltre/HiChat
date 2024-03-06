@@ -1,0 +1,12 @@
+port: '8000'
+mysql:
+  host: 'localhost'
+  port: '9090'
+  name: 'hi_chat'
+  user: 'root'
+  password: 'sy20021213'
+redis:
+  host: 'localhost'
+  port: '6379'
+  password: ''
+  DB: 0

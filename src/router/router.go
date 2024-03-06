@@ -46,5 +46,15 @@ func Router() *gin.Engine {
 		relation.DELETE("/delete-group", service.DelGroup)
 	}
 
+	// Message Module
+	message := v1.Group("message").Use(middleware.Authentication())
+	{
+		message.GET("/get-records", service.RedisMsg)
+		message.POST("/send", service.SendMsg)
+	}
+
+	// File Upload Module
+	v1.POST("/upload", service.UploadFile)
+
 	return router
 }

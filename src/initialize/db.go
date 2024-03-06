@@ -1,7 +1,6 @@
 package initialize
 
 import (
-	"HiChat/src/config"
 	"HiChat/src/global"
 	"fmt"
 	"github.com/redis/go-redis/v9"
@@ -15,10 +14,10 @@ import (
 
 // InitDB  initial the connection to the MySQL DB
 func InitDB() {
-
+	sqlConfig := global.ServiceConfig.DB
 	// declare the connection to the DB
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.User, config.Password, config.Host, config.Port, config.DBName)
+		sqlConfig.User, sqlConfig.Password, sqlConfig.Host, sqlConfig.Port, sqlConfig.Name)
 
 	// set the config of logger
 	newLogger := logger.New(
@@ -49,10 +48,11 @@ func InitDB() {
 
 // InitRedis initial the connection to the Redis DB
 func InitRedis() {
+	redisConfig := global.ServiceConfig.RedisDB
 	opt := redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", config.RedisHost, config.RedisPort),
-		Password: "",
-		DB:       0,
+		Addr:     fmt.Sprintf("%s:%d", redisConfig.Host, redisConfig.Port),
+		Password: redisConfig.Password,
+		DB:       redisConfig.DB,
 	}
 	global.RedisDB = redis.NewClient(&opt)
 }
