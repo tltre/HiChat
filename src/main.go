@@ -9,6 +9,7 @@ func main() {
 	// initialize work
 	initialize.InitLogger()
 	initialize.InitDB()
+	initialize.InitRedis()
 	println("successfully initialize!")
 
 	// start the router (gin service)

@@ -4,6 +4,7 @@ import (
 	"HiChat/src/config"
 	"HiChat/src/global"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -44,4 +45,14 @@ func InitDB() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// InitRedis initial the connection to the Redis DB
+func InitRedis() {
+	opt := redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", config.RedisHost, config.RedisPort),
+		Password: "",
+		DB:       0,
+	}
+	global.RedisDB = redis.NewClient(&opt)
 }
