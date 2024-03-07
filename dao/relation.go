@@ -12,7 +12,7 @@ func GetFriendList(userId uint) (*[]models.UserBasic, error) {
 	relations := make([]models.Relation, 0)
 	if tx := global.DB.Where("owner_Id = ? and type = 1", userId).Find(&relations); tx.RowsAffected == 0 {
 		zap.S().Info("Didn't Find relation data")
-		return nil, errors.New("failed to get friend list")
+		return nil, nil
 	}
 
 	// Get Friends ID List

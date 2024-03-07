@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"HiChat/common"
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -11,9 +10,6 @@ import (
 	"strconv"
 	"time"
 )
-
-// TokenIsExpired Define a Error
-var TokenIsExpired = errors.New("token is Expired")
 
 // JwtSecret Define a secret
 var JwtSecret = []byte("HelloWorld")
@@ -28,7 +24,7 @@ type Claim struct {
 func GenerateToken(userId uint, issuer string) (string, error) {
 	// Set effective time of token
 	curTime := time.Now()
-	expiredTime := curTime.Add(5 * time.Minute)
+	expiredTime := curTime.Add(24 * time.Hour)
 
 	// Set token information
 	claim := Claim{
@@ -55,12 +51,12 @@ func GenerateToken(userId uint, issuer string) (string, error) {
 */
 func Authentication() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		token := ctx.Request.PostFormValue("token")
-		id := ctx.Request.PostFormValue("id")
+		token := ctx.Query("token")
+		id := ctx.Query("userId")
 
 		userId, err := strconv.Atoi(id)
 		if err != nil {
-			zap.S().Info("Illegal UserId")
+			zap.S().Info("Illegal UserId: ", err.Error())
 			common.SendErrorResp(ctx.Writer, http.StatusUnauthorized, "Illegal UserId", nil)
 			ctx.Abort()
 			return

@@ -2,6 +2,7 @@ package main
 
 import (
 	"HiChat/global"
+	"HiChat/initialize"
 	"HiChat/models"
 	"context"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 )
 
 func ConnectToDatabase() *gorm.DB {
+	initialize.InitConfig("debug")
 	sqlConfig := global.ServiceConfig.DB
 	// declare the connection to the DB
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",

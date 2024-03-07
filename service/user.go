@@ -81,7 +81,7 @@ func UserRegister(ctx *gin.Context) {
 	user := models.UserBasic{}
 	username := ctx.PostForm("name")
 	pwd := ctx.PostForm("password")
-	rePwd := ctx.PostForm("identity")
+	rePwd := ctx.PostForm("Identity")
 
 	data := make(map[string]string)
 

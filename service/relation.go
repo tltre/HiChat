@@ -12,6 +12,7 @@ import (
 
 // a data model that define the User information return to User
 type user struct {
+	ID     uint
 	Name   string
 	Avatar string
 	Gender string
@@ -21,15 +22,15 @@ type user struct {
 
 // FriendList Get one's friend list by his userID
 func FriendList(ctx *gin.Context) {
-	// try to get user id
-	userId, err := strconv.Atoi(ctx.PostForm("id"))
+	// try to get user userId
+	userId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get UserId"
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	// search friend list by id in DAO
+	// search friend list by userId in DAO
 	friendList, err := dao.GetFriendList(uint(userId))
 	if err != nil {
 		zap.S().Info(err.Error())
@@ -38,9 +39,16 @@ func FriendList(ctx *gin.Context) {
 		return
 	}
 
+	if friendList == nil {
+		zap.S().Info("User didn't have any friends")
+		common.SendNormalResp(ctx.Writer, "User didn't have any friends", nil, nil, 0)
+		return
+	}
+
 	friends := make([]user, 0)
 	for _, f := range *friendList {
 		friends = append(friends, user{
+			ID:     f.ID,
 			Name:   f.Name,
 			Avatar: f.Avatar,
 			Gender: f.Gender,
@@ -55,14 +63,14 @@ func FriendList(ctx *gin.Context) {
 // AddFriendByName call DAO to create a relationship between currentUser and targetUser
 func AddFriendByName(ctx *gin.Context) {
 	// try to get ownerId and targetName
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	targetName := ctx.PostForm("target_name")
+	targetName := ctx.PostForm("targetName")
 
 	// Add Friend in DAO
 	err = dao.AddFriendByName(uint(ownerId), targetName)
@@ -78,7 +86,7 @@ func AddFriendByName(ctx *gin.Context) {
 // UpdateRelation update relation desc
 func UpdateRelation(ctx *gin.Context) {
 	// try to get ownerId and targetName
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
@@ -132,7 +140,7 @@ func UpdateRelation(ctx *gin.Context) {
 // DelFriendByName Delete friend by name
 func DelFriendByName(ctx *gin.Context) {
 	// try to get ownerId and targetName
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
@@ -151,8 +159,8 @@ func DelFriendByName(ctx *gin.Context) {
 
 // GetGroupList return group list that user has joined in
 func GetGroupList(ctx *gin.Context) {
-	// try to get owner id
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	// try to get owner userId
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
@@ -166,13 +174,18 @@ func GetGroupList(ctx *gin.Context) {
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
+	if communities == nil {
+		zap.S().Info("User didn't join in any community")
+		common.SendNormalResp(ctx.Writer, "User didn't join in any community", nil, nil, 0)
+		return
+	}
 	common.SendNormalResp(ctx.Writer, "Successfully find group!", nil, *communities, len(*communities))
 }
 
 // CreateGroup create a group by userId
 func CreateGroup(ctx *gin.Context) {
 	// try to get community information
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
@@ -238,8 +251,8 @@ func SearchGroup(ctx *gin.Context) {
 
 // JoinGroup Join in Group by GID
 func JoinGroup(ctx *gin.Context) {
-	// try to get owner id and gid
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	// try to get owner userId and gid
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
@@ -265,15 +278,15 @@ func JoinGroup(ctx *gin.Context) {
 
 // UpdateGroup Update group information
 func UpdateGroup(ctx *gin.Context) {
-	// try to get Owner id
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	// try to get Owner userId
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"
 		common.SendErrorResp(ctx.Writer, http.StatusInternalServerError, errMsg, nil)
 		return
 	}
-	// try to get new Owner id
+	// try to get new Owner userId
 	var newOwnerId = 0
 	if NewIdStr := ctx.PostForm("new_owner_id"); NewIdStr != "" {
 		if newOwnerId, err = strconv.Atoi(NewIdStr); err != nil {
@@ -327,8 +340,8 @@ func UpdateGroup(ctx *gin.Context) {
 
 // DelGroup Delete or Quit group by userID and gid
 func DelGroup(ctx *gin.Context) {
-	// try to get Owner id
-	ownerId, err := strconv.Atoi(ctx.PostForm("id"))
+	// try to get Owner userId
+	ownerId, err := strconv.Atoi(ctx.Query("userId"))
 	if err != nil {
 		zap.S().Info(err.Error())
 		errMsg := "Failed to Get OwnerId"

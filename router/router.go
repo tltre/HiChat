@@ -32,13 +32,13 @@ func Router() *gin.Engine {
 	relation := v1.Group("relation").Use(middleware.Authentication())
 	{
 		// Friends API
-		relation.GET("/list", service.FriendList)
+		relation.POST("/list", service.FriendList)
 		relation.POST("/add", service.AddFriendByName)
 		relation.POST("/update", service.UpdateRelation)
 		relation.DELETE("/delete", service.DelFriendByName)
 
 		// Group API
-		relation.GET("/group-list", service.GetGroupList)
+		relation.POST("/group_list", service.GetGroupList)
 		relation.POST("/new", service.CreateGroup)
 		relation.GET("/search", service.SearchGroup)
 		relation.POST("/join", service.JoinGroup)
@@ -49,20 +49,21 @@ func Router() *gin.Engine {
 	// Message Module
 	message := v1.Group("message").Use(middleware.Authentication())
 	{
-		message.GET("/get-records", service.RedisMsg)
-		message.POST("/send", service.SendMsg)
+		message.POST("/get-records", service.RedisMsg)
+		message.GET("/send", service.SendMsg)
 	}
 
 	// File Upload Module
 	v1.POST("/upload", service.UploadFile)
 
 	// Static Recourses
-	router.Static("/asset", "asset/")
-	router.LoadHTMLGlob("./views/**/*")
-	router.GET("/", service.GetIndex)
-	router.GET("/index", service.GetIndex)
+	router.Static("/vendors", "./statics/vendors")
+	router.Static("/dist", "./statics/dist")
+
 	router.GET("/register", service.GetRegister)
 	router.GET("/toChat", service.ToChat)
+	router.GET("/", service.GetIndex)
+	router.GET("/index", service.GetIndex)
 
 	return router
 }

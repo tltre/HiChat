@@ -10,8 +10,8 @@ import (
 
 // RedisMsg Get message from Redis
 func RedisMsg(ctx *gin.Context) {
-	userIdA, _ := strconv.Atoi(ctx.PostForm("userIdA"))
-	userIdB, _ := strconv.Atoi(ctx.PostForm("userIdB"))
+	userIdA, _ := strconv.Atoi(ctx.Query("userId"))
+	userIdB, _ := strconv.Atoi(ctx.Query("targetId"))
 	start, _ := strconv.Atoi(ctx.PostForm("start"))
 	end, _ := strconv.Atoi(ctx.PostForm("end"))
 	isRev, _ := strconv.ParseBool(ctx.PostForm("isRev"))

@@ -13,7 +13,7 @@ func GetGroupList(userId uint) (*[]models.Community, error) {
 	relations := make([]models.Relation, 0)
 	if tx := global.DB.Where("owner_id = ? and type = 2", userId).Find(&relations); tx.RowsAffected == 0 {
 		zap.S().Info("User didn't join in any community")
-		return nil, errors.New("user didn't join in any community")
+		return nil, nil
 	}
 	communitiesId := make([]uint, 0)
 	for _, r := range relations {

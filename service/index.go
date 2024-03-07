@@ -15,7 +15,7 @@ import (
 // @Accept json
 // @Router /index [get]
 func GetIndex(ctx *gin.Context) {
-	tem, err := template.ParseFiles("index.html", "views/chat/head.html")
+	tem, err := template.ParseFiles("statics/login.html")
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func GetIndex(ctx *gin.Context) {
 }
 
 func GetRegister(ctx *gin.Context) {
-	tem, err := template.ParseFiles("views/user/register.html")
+	tem, err := template.ParseFiles("statics/register.html")
 	if err != nil {
 		panic(err)
 	}
@@ -34,17 +34,7 @@ func GetRegister(ctx *gin.Context) {
 }
 
 func ToChat(ctx *gin.Context) {
-	tem, err := template.ParseFiles("views/chat/index.html",
-		"views/chat/head.html",
-		"views/chat/foot.html",
-		"views/chat/tabmenu.html",
-		"views/chat/concat.html",
-		"views/chat/group.html",
-		"views/chat/profile.html",
-		"views/chat/main.html",
-		"views/chat/createcom.html",
-		"views/chat/userinfo.html",
-	)
+	tem, err := template.ParseFiles("statics/index.html")
 	if err != nil {
 		panic(err)
 	}
