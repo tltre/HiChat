@@ -121,7 +121,7 @@
         </ul>
         <hr>
         <p class="text-muted">Don't have an account?</p>
-        <a id="reg" href="./register" class="btn btn-outline-light btn-sm">Register now!</a>
+        <a id="reg" href="/register" class="btn btn-outline-light btn-sm">Register now!</a>
     </form>
     <!-- ./ form -->
 
@@ -159,7 +159,7 @@
                 util.post("/v1/user/login",this.user).then(res=>{
                     console.log("返回",res.Msg)
                     if(res.Code!=0){
-                        mui.toast(res.message)
+                        mui.toast(res.Msg)
                     }else{
                         mui.toast("登录成功,即将跳转")
                         location.replace("http://localhost:8000/toChat?userId="+res.Data.userId+"&token="+res.Data.token)

@@ -14,10 +14,15 @@
 
     <!-- App styles -->
     <link rel="stylesheet" href="dist/css/app.min.css">
+
+    <script src="./dist/js/vue.min.js"></script>
+    <script src="./dist/js/util.js" ></script>
+    <script src="./dist/js/mui.js" ></script>
+
 </head>
 <body class="form-membership">
 
-<div class="form-wrapper">
+<div class="form-wrapper" id="pageapp">
 
     <!-- logo -->
     <div class="logo">
@@ -60,20 +65,17 @@
     <h5>Create account</h5>
 
     <!-- form -->
-    <form>
+    <form @submit.prevent="register">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Firstname" required autofocus>
+            <input type="text" class="form-control" placeholder="Username" v-model="user.name" required autofocus>
         </div>
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Lastname" required>
+            <input type="password" class="form-control" placeholder="Password" v-model="user.password" required>
         </div>
         <div class="form-group">
-            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="password" class="form-control" placeholder="Identity" v-model="user.Identity" required>
         </div>
-        <div class="form-group">
-            <input type="password" class="form-control" placeholder="Password" required>
-        </div>
-        <button class="btn btn-primary btn-block">Register</button>
+        <button class="btn btn-primary btn-block" type="submit">Register</button>
         <hr>
         <p class="text-muted">Already have an account?</p>
         <a href="./login.html" class="btn btn-outline-light btn-sm">Sign in!</a>
@@ -89,5 +91,40 @@
 
 <!-- App scripts -->
 <script src="dist/js/app.min.js"></script>
+
+
+<script>
+    var app = new Vue({
+        el: "#pageapp",
+        data: function () {
+            return {
+                user: {
+                    name: "",
+                    password: "",
+                    Identity: "",
+                }
+            }
+        },
+        methods: {
+            register: function () {
+                console.log("register")
+                console.log(this.user)
+                //网络请求
+                //封装了promis
+                util.post("/v1/user/new", this.user).then(res => {
+                    console.log(res)
+                    if (res.Code != 0) {
+                        mui.toast(res.Msg)
+                    } else {
+                        //location.replace("localhost:8081")
+                        mui.toast("注册成功,即将跳转")
+                        location.href = "/"
+                    }
+                })
+            },
+        }
+    })
+</script>
+
 </body>
 </html>

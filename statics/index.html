@@ -1973,43 +1973,5 @@
 <!-- Examples -->
 <script src="dist/js/examples.js"></script>
 
-
-<script>
-    var app = new Vue({
-        el:"#pageapp",
-        data:function(){
-            return {
-                user:{
-                    name:"",
-                    password:""
-                }
-            }
-        },
-        methods:{
-            login:function(){
-                //检测手机号是否正确
-                console.log("login")
-                //检测密码是否为空
-
-                console.log(this.user.name)
-
-                console.log(this.user)
-
-                //网络请求
-                //封装了promis
-                util.post("/v1/user/login_pw",this.user).then(res=>{
-                    console.log("返回",res.message)
-                    if(res.code!=0){
-                        mui.toast(res.message)
-                    }else{
-                        mui.toast("登录成功,即将跳转")
-                        location.replace("//1.14.180.202:8000/toChat?userId="+res.userId+"&token="+res.tokens)
-                    }
-                })
-            },
-        }
-    })
-</script>
-
 </body>
 </html>
