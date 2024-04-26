@@ -34,7 +34,7 @@ type UserBasic struct {
 	DeviceInfo    string // the device of login in
 }
 
-// UserTableName 返回用户表的名字
+// UserTableName return the name of User Table
 func (b *UserBasic) UserTableName() string {
 	return "user_basic"
 }

@@ -18,6 +18,11 @@
 
     <!-- App styles -->
     <link rel="stylesheet" href="dist/css/app.min.css">
+
+    <script src="./dist/js/vue.min.js"></script>
+    <script src="./dist/js/util.js" ></script>
+    <script src="./dist/js/mui.js" ></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>-->
 </head>
 <body>
 
@@ -653,133 +658,8 @@
                 <form>
                     <input type="text" class="form-control" placeholder="Search chats">
                 </form>
-                <div class="sidebar-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <figure class="avatar avatar-state-success">
-                                <img src="dist/media/img/man_avatar1.jpg" class="rounded-circle" alt="image">
-                            </figure>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5 class="text-primary">Townsend Seary</h5>
-                                    <p>What's up, how are you?</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <div class="new-message-count">3</div>
-                                    <small class="text-primary">03:41 PM</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <figure class="avatar avatar-state-warning">
-                                <img src="dist/media/img/man_avatar4.jpg" class="rounded-circle" alt="image">
-                            </figure>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5 class="text-primary">Forest Kroch</h5>
-                                    <p>
-                                        <i class="fa fa-camera mr-1"></i> Photo
-                                    </p>
-                                </div>
-                                <div class="users-list-action">
-                                    <div class="new-message-count">1</div>
-                                    <small class="text-primary">Yesterday</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item open-chat">
-                            <div>
-                                <figure class="avatar">
-                                    <img src="dist/media/img/man_avatar3.jpg" class="rounded-circle" alt="image">
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Byrom Guittet</h5>
-                                    <p>I sent you all the files. Good luck with 😃</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">11:05 AM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <img src="dist/media/img/women_avatar1.jpg" class="rounded-circle" alt="image">
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Margaretta Worvell</h5>
-                                    <p>I need you today. Can you come with me?</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <figure class="avatar">
-                                <span class="avatar-title bg-warning bg-success rounded-circle">
-                                    <i class="fa fa-users"></i>
-                                </span>
-                            </figure>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>😍 My Family 😍</h5>
-                                    <p><strong>Maher Ruslandi: </strong>Hello!!!</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">Yesterday</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                <div class="sidebar-body"  id="sidebody">
+                    <ul class="list-group list-group-flush" v-for="(friend, index) in friends" :key="index">
                         <li class="list-group-item">
                             <div>
                                 <figure class="avatar avatar-state-warning">
@@ -788,13 +668,9 @@
                             </div>
                             <div class="users-list-body">
                                 <div>
-                                    <h5>Jennica Kindred</h5>
-                                    <p>
-                                        <i class="fa fa-video-camera mr-1"></i>
-                                        Video
-                                    </p>
+                                    <h5>{{friend.Name}}</h5>
                                 </div>
-                                <div class="users-list-action">
+                                <!--<div class="users-list-action">
                                     <small class="text-muted">03:41 PM</small>
                                     <div class="action-toggle">
                                         <div class="dropdown">
@@ -810,194 +686,7 @@
                                                 <a href="#" class="dropdown-item text-danger">Delete</a>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <span class="avatar-title bg-info rounded-circle">M</span>
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Marvin Rohan</h5>
-                                    <p>Have you prepared the files?</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">Yesterday</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <img src="dist/media/img/women_avatar2.jpg" class="rounded-circle" alt="image">
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Townsend Seary</h5>
-                                    <p>Where are you?</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <span class="avatar-title bg-secondary rounded-circle">G</span>
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Gibb Ivanchin</h5>
-                                    <p>I want to visit them.</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <img src="dist/media/img/man_avatar1.jpg" class="rounded-circle" alt="image">
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Harald Kowalski</h5>
-                                    <p>Reports are ready.</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <span class="avatar-title bg-success rounded-circle">A</span>
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Afton McGilvra</h5>
-                                    <p>I do not know where is it. Don't ask me, please.</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div>
-                                <figure class="avatar">
-                                    <img src="dist/media/img/man_avatar2.jpg" class="rounded-circle" alt="image">
-                                </figure>
-                            </div>
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Alexandr Donnelly</h5>
-                                    <p>Can anyone enter the meeting?</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <small class="text-muted">03:41 PM</small>
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" data-navigation-target="contact-information"
-                                                   class="dropdown-item">Profile</a>
-                                                <a href="#" class="dropdown-item">Add to archive</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </div>-->
                             </div>
                         </li>
                     </ul>
@@ -1339,13 +1028,12 @@
                 </form>
                 <div class="sidebar-body">
                     <ul class="list-group list-group-flush users-list">
-                        <li class="list-group-item">
+                        <li class="list-group-item" v-for="(friend, index) in friends" :key="index">
                             <div class="users-list-body">
                                 <div>
-                                    <h5>Jennica Kindred</h5>
-                                    <p>I know how important this file is to you. You can trust me ;)</p>
+                                    <h5>{{ friend.username }}</h5>
                                 </div>
-                                <div class="users-list-action">
+                                <!--<div class="users-list-action">
                                     <div class="action-toggle">
                                         <div class="dropdown">
                                             <a data-toggle="dropdown" href="#">
@@ -1357,70 +1045,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Marvin Rohan</h5>
-                                    <p>Lorem ipsum dolor sitsdc sdcsdc sdcsdcs</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" class="dropdown-item">Remove favorites</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Frans Hanscombe</h5>
-                                    <p>Lorem ipsum dolor sitsdc sdcsdc sdcsdcs</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" class="dropdown-item">Remove favorites</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="users-list-body">
-                                <div>
-                                    <h5>Karl Hubane</h5>
-                                    <p>Lorem ipsum dolor sitsdc sdcsdc sdcsdcs</p>
-                                </div>
-                                <div class="users-list-action">
-                                    <div class="action-toggle">
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" href="#">
-                                                <i data-feather="more-horizontal"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a href="#" class="dropdown-item">Open</a>
-                                                <a href="#" class="dropdown-item">Remove favorites</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </div>-->
                             </div>
                         </li>
                     </ul>
@@ -1972,6 +1597,38 @@
 
 <!-- Examples -->
 <script src="dist/js/examples.js"></script>
+
+
+<!-- Vue Functions -->
+<script>
+    var v = new Vue({
+        el:"#sidebody",
+        data:function(){
+            return {
+                friends: []
+            };
+        },
+        created() {
+            this.fetchFriends();
+        },
+        methods: {
+            fetchFriends() {
+                // 向后端发送请求的代码，获取好友列表数据并赋值给this.friends
+                // TODO: POST should Add token and userId
+
+                util.post('/v1/user/list').then(response => {
+                  console.log("返回",res.Msg)
+                    if(response.Code!=0){
+                        mui.toast(res.Msg)
+                    }else{
+                        this.friends = response.data;
+                    }
+                    console.log("Success to get Data")
+                });
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

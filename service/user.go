@@ -140,7 +140,7 @@ func UserRegister(ctx *gin.Context) {
 	common.SendNormalResp(ctx.Writer, "Success to Register", nil, user, 1)
 }
 
-// UpdateUserInformation 更新用户信息
+// UpdateUserInformation POST method, update the information of user
 func UpdateUserInformation(ctx *gin.Context) {
 	user := models.UserBasic{}
 

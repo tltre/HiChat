@@ -136,6 +136,34 @@ Core.prototype.post=function(uri,data,fn){
 
     })
 }
+
+Core.prototype.get=function(uri,data,fn){
+	var url = this.api(uri)
+	return new Promise(function (resolve, reject) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET",url, true);
+		// 添加http头，发送信息至服务器时内容编码类型
+		xhr.setRequestHeader(
+			"Content-Type",
+			"application/x-www-form-urlencoded"
+		);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+				resolve(JSON.parse(xhr.responseText));
+			}
+		};
+		xhr.onerror = function(){
+			reject({"code":-1,"msg":"服务器繁忙"})
+		}
+		var _data=[];
+		for(var i in data){
+			_data.push( i +"=" + encodeURI(data[i]));
+		}
+		xhr.send(_data.join("&"));
+
+	})
+}
+
 Core.prototype.uploadfile=function(uri,dom){
     var url = this.api(uri)
     return new Promise(function (resolve, reject) {

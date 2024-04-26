@@ -21,7 +21,7 @@ func Router() *gin.Engine {
 	// offer service for the URL likes "/v1/user/....."
 	user := v1.Group("user")
 	{
-		user.GET("/list", middleware.Authentication(), service.UserList)
+		user.POST("/list", middleware.Authentication(), service.UserList)
 		user.POST("/login", service.UserLoginByNameAndPwd)
 		user.POST("/new", service.UserRegister)
 		user.POST("/update", middleware.Authentication(), service.UpdateUserInformation)

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"html/template"
+	"net/http"
 	"strconv"
 )
 
@@ -34,11 +35,6 @@ func GetRegister(ctx *gin.Context) {
 }
 
 func ToChat(ctx *gin.Context) {
-	tem, err := template.ParseFiles("statics/index.html")
-	if err != nil {
-		panic(err)
-	}
-
 	//获取参数
 	user := models.UserBasic{}
 	id := ctx.Query("userId")
@@ -52,5 +48,7 @@ func ToChat(ctx *gin.Context) {
 	user.Identity = ctx.Query("token")
 
 	zap.S().Info("获取数据：", user)
-	tem.Execute(ctx.Writer, "欢迎来到HiChat主页")
+
+	// 发送html文件
+	http.ServeFile(ctx.Writer, ctx.Request, "statics/index.html")
 }

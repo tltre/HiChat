@@ -25,7 +25,7 @@ type ResponseBody struct {
 	Total int
 }
 
-// SendNormalResp Unified return normal information
+// SendNormalResp return normal information
 func SendNormalResp(w http.ResponseWriter, msg string, data map[string]string, rows interface{}, total int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
