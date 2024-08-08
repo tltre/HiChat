@@ -1,7 +1,7 @@
 port: '8000'
 mysql:
   host: 'localhost'
-  port: '9090'
+  port: '3306'
   name: 'hichat'
   user: 'root'
   password: 'sy20021213'

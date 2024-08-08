@@ -2,8 +2,10 @@ package service
 
 import (
 	"HiChat/common"
+	"HiChat/connect"
 	"HiChat/models"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 )
@@ -25,5 +27,19 @@ func RedisMsg(ctx *gin.Context) {
 
 // SendMsg user send message to friend/group
 func SendMsg(ctx *gin.Context) {
-	models.Chat(ctx.Writer, ctx.Request)
+	//models.Chat(ctx.Writer, ctx.Request)
+
+	w := ctx.Writer
+	r := ctx.Request
+
+	// Parsing UserID
+	q := r.URL.Query()
+	id := q.Get("userId")
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		zap.S().Info("Failed to get userId: ", err)
+		return
+	}
+
+	connect.UpgradeConnection(w, r, userId)
 }

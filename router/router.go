@@ -49,8 +49,8 @@ func Router() *gin.Engine {
 	// Message Module
 	message := v1.Group("message").Use(middleware.Authentication())
 	{
-		message.POST("/get-records", service.RedisMsg)
-		message.GET("/send", service.SendMsg)
+		message.GET("/get-records", service.RedisMsg)
+		message.POST("/send", service.SendMsg)
 	}
 
 	// File Upload Module
